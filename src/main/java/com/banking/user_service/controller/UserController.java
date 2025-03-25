@@ -28,4 +28,10 @@ public class UserController {
         return ResponseEntity.ok(apiResponse);
     }
 
+    @DeleteMapping("/delete-user")
+    public ResponseEntity<ApiResponse> deleteUser(@RequestBody User user){
+        ApiResponse apiResponse = userService.deleteUser(user);
+        return ResponseEntity.ok(apiResponse);
+    }
+
 }

@@ -58,4 +58,12 @@ public class GlobalExceptionHandler {
         return ResponseEntity.badRequest().body(apiExceptionResponse);
     }
 
+    @ExceptionHandler(UsernameAndPasswordNotNullException.class)
+    public ResponseEntity<ApiExceptionResponse> handleUsernameAndPasswordNotNullException(UsernameAndPasswordNotNullException ex){
+        ApiExceptionResponse apiExceptionResponse
+                = new ApiExceptionResponse(ex.getMessage(),
+                "Username and Password should not be empty.");
+        return ResponseEntity.badRequest().body(apiExceptionResponse);
+    }
+
 }

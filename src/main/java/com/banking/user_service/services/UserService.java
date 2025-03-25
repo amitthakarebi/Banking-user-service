@@ -1,10 +1,7 @@
 package com.banking.user_service.services;
 
 import com.banking.user_service.entities.User;
-import com.banking.user_service.exceptions.GeneralException;
-import com.banking.user_service.exceptions.PasswordDoesNotMatchException;
-import com.banking.user_service.exceptions.UsernameAlreadyExist;
-import com.banking.user_service.exceptions.UsernameNotFoundException;
+import com.banking.user_service.exceptions.*;
 import com.banking.user_service.repository.UserRepository;
 import com.banking.user_service.response.ApiResponse;
 import org.hibernate.NonUniqueResultException;
@@ -32,7 +29,7 @@ public class UserService {
         user.setUpdatedAt(localDateTime);
         user.setLastLogin(localDateTime);
         userRepository.save(user);
-        return new ApiResponse("Successfully created the user.", "Success", user.getUsername());
+        return new ApiResponse("Successfully created the user.", "Success");
     }
 
     public ApiResponse updateUser(User user) {
@@ -85,7 +82,23 @@ public class UserService {
         existingUser.setUpdatedAt(localDateTime);
 
         userRepository.save(existingUser);
-        return new ApiResponse("Successfully updated the user.", "Success", user.getUsername());
+        return new ApiResponse("Successfully updated the user.", "Success");
 
+    }
+
+    public ApiResponse deleteUser(User user) {
+        if(user.getUsername()==null || user.getPassword()==null ||
+        user.getUsername().isEmpty() || user.getPassword().isEmpty()){
+            throw new UsernameAndPasswordNotNullException("Error occurred while deleting user.");
+        }
+        Optional<User> dbUser = userRepository.getUserByUsername(user.getUsername());
+        if (dbUser.isEmpty()) {
+            throw new UsernameNotFoundException("Error occurred while deleting user.");
+        }else if(!dbUser.get().getPassword().equals(user.getPassword())){
+            throw new PasswordDoesNotMatchException("Error occurred while deleting user.");
+        }else{
+            userRepository.delete(dbUser.get());
+            return new ApiResponse("Successfully deleted the user.", "Success");
+        }
     }
 }

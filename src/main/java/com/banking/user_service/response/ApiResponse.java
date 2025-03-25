@@ -13,11 +13,5 @@ public class ApiResponse {
 
     private String message;
     private String status;
-    private Object data;
-
-    public ApiResponse(String message, String status){
-        this.message = message;
-        this.status = status;
-    }
 
 }
