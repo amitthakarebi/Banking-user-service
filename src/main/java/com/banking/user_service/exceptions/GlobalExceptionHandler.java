@@ -42,4 +42,20 @@ public class GlobalExceptionHandler {
         return new ResponseEntity<>(errors, HttpStatus.BAD_REQUEST);
     }
 
+    @ExceptionHandler(UsernameNotFoundException.class)
+    public ResponseEntity<ApiExceptionResponse> handleUsernameNotFoundException(UsernameNotFoundException ex){
+        ApiExceptionResponse apiExceptionResponse
+                = new ApiExceptionResponse(ex.getMessage(),
+                "Provided username is not found in the system. Please send correct username.");
+        return ResponseEntity.badRequest().body(apiExceptionResponse);
+    }
+
+    @ExceptionHandler(PasswordDoesNotMatchException.class)
+    public ResponseEntity<ApiExceptionResponse> handlePasswordDoesNotMatchException(PasswordDoesNotMatchException ex){
+        ApiExceptionResponse apiExceptionResponse
+                = new ApiExceptionResponse(ex.getMessage(),
+                "Password does not matched with existing username.");
+        return ResponseEntity.badRequest().body(apiExceptionResponse);
+    }
+
 }
