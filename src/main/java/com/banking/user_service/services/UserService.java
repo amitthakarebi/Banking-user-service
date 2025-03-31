@@ -1,5 +1,7 @@
 package com.banking.user_service.services;
 
+import com.banking.user_service.dto.PasswordChangeDTO;
+import com.banking.user_service.dto.UserDTO;
 import com.banking.user_service.entities.User;
 import com.banking.user_service.exceptions.*;
 import com.banking.user_service.repository.UserRepository;
@@ -10,7 +12,9 @@ import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Service
 public class UserService {
@@ -100,5 +104,45 @@ public class UserService {
             userRepository.delete(dbUser.get());
             return new ApiResponse("Successfully deleted the user.", "Success");
         }
+    }
+
+    public ApiResponse updatePassword(PasswordChangeDTO user) {
+
+        if(user.getUsername()==null || user.getCurrentPassword()==null || user.getNewPassword()==null ||
+                user.getUsername().isEmpty() || user.getCurrentPassword().isEmpty() || user.getNewPassword().isEmpty()){
+            throw new UsernameAndPasswordNotNullException("Error occurred while deleting user.");
+        }
+        Optional<User> dbUser = userRepository.getUserByUsername(user.getUsername());
+        if (dbUser.isEmpty()) {
+            throw new UsernameNotFoundException("Error occurred while deleting user.");
+        }else if(!dbUser.get().getPassword().equals(user.getCurrentPassword())){
+            throw new PasswordDoesNotMatchException("Error occurred while deleting user.");
+        }else{
+            User tempUser = dbUser.get();
+            tempUser.setPassword(user.getNewPassword());
+            userRepository.save(tempUser);
+            return new ApiResponse("Successfully updated the user.", "Success");
+        }
+
+    }
+
+    public User getUserByUsername(String username) {
+
+        Optional<User> dbUser = userRepository.getUserByUsername(username);
+        if (dbUser.isEmpty()) {
+            throw new UsernameNotFoundException("Error occurred while deleting user.");
+        }else{
+            return dbUser.get();
+        }
+
+
+    }
+
+    public List<UserDTO> getAllUsers() {
+        List<User> users = userRepository.findAll();
+        List<UserDTO> userDTOS = users.stream()
+                .map(UserDTO::new)
+                .toList();
+        return userDTOS;
     }
 }
